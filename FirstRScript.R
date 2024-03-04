@@ -198,4 +198,147 @@ qplot(y)
 #Trying again
 
 
+# Write a function that rolls a pair of dice and reports their sum ----
+roll_fair <- function(x) {
+  dice <- sample(x = 1:6, size = 2, replace = TRUE)
+  return(sum(dice))
+}
 
+roll_fair()
+
+#Write a function that rolls a pair of loaded dice that are twice more likely
+# to come 5 or 6 any other numbers and returns
+roll_loaded <- function(){
+  dice <- sample(x = c(1:6, 5,6), size = 2, replace = TRUE)
+  return(sum(dice))
+}
+
+roll_loaded()
+
+roll_loaded2 <- function(){
+  dice <- sample(x = 1:6, size = 2, replace = TRUE, prob = c(1,1,1,1,2,2))
+  return(sum(dice))
+}
+
+roll_loaded2()
+
+#Repeat 1000 times and graph or sum
+
+?replicate()
+
+replicate(n = 1000, expr = roll_fair(), simplify = "array")
+
+fair_sums <- replicate(n = 1000, expr = roll_fair(), simplify = "array")
+
+loaded_sums <- replicate(n =1000, expr = roll_loaded(), simplify = "array")
+
+plot(fair_sums)
+hist(fair_sums)
+hist(loaded_sums)
+plot(loaded_sums)
+
+fig1 <- ggplot2::qplot(fair_sums)
+fig2 <- ggplot2::qplot(loaded_sums)
+
+fig1
+
+cowplot::plot_grid(fig1, fig2, nrow = 1)
+# the ... in cowplot means number of graphs in grid
+
+#Write a function that rolls 1000 die and returns the sum
+#roll_many(n) --> roll n pairs of dice and return the sums
+
+roll_many <- function(n){
+  die1 <- sample(1:6, n, TRUE)
+  die2 <- sample(1:6, n, TRUE)
+  return(die1 + die2)
+}
+
+ggplot2::qplot(roll_many(1e4))
+
+#magrittr ----
+
+library(magrittr)
+
+x <- 3
+y <- exp(x)
+z <- sqrt(y)
+t <- log10(z)
+s <- abs(t)
+
+#This is the same but not as clean as above
+s <- abs(log10(sqrt(exp(3))))
+
+#This is the same and lets you change x
+# %>% which is a pipe, eans "and then"
+s <- x %>%
+  exp() %>%
+  sqrt() %>%
+  log10() %>%
+  abs()
+
+subtraction <- function(x,y){
+  return(x-y)
+}
+
+x <- 3
+
+x %>%
+  subtraction(1)
+
+x %>%
+  subtraction(1, .)
+
+#R objects and notations ----
+
+#atomic vectors
+die <- (sample(x = 1:6, 2, replace = TRUE))
+is.vector(die)
+length(die) # will use often
+
+five <- 5
+is.vector(five)
+length(five)
+
+typeof(die)
+
+#Assumes integer until you give it more information
+typeof(die+ 0.0)
+
+sqrt(2)^2 - 2
+
+sqrt(4)^2 - 4
+
+
+#Logical Vectors ----
+
+logicals <- c(TRUE, FALSE, T, F, F, F)
+typeof(logicals)
+
+text <- c("Hello", "World")
+length(text)
+typeof(text)
+
+five <- 5L
+typeof(five)
+
+#Coercion ----
+logicals
+int <- c(1L, 5L)
+
+#r transforms logical to numerics
+#below is the same as c(logicals, int)
+logicals %>%
+  c(int)
+c(logicals, int)
+
+#Making the integers logical
+as.logical(int)
+
+logicals %>%
+  c(int) %>%
+  c(die) %>%
+  c(text) %>%
+  typeof()
+
+  
