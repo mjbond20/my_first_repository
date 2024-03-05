@@ -229,4 +229,305 @@ mean(deck$suit == "clubs")
 
 deck2 <- deck
 
-  
+vec <- rep(0, 6)
+vec
+
+vec[1]
+vec[1] <- 1000
+
+vec
+
+vec[c(1,3,5)] <- c(1,2,1)
+vec
+vec[4:6] <- vec[4:6] + 1
+vec
+vec[1:3] <- vec[1:3] + vec[4:6]
+vec
+
+vec[7] <- 0
+vec
+vec[7] <- NA
+vec
+vec <- vec[-7]
+vector2
+
+deck2 <- deck
+
+deck2 %>% head()
+
+deck2$new <- NULL
+
+deck2 %>% 
+  head()
+
+#Let's bump the values of aces to 15
+# where are the aces?
+
+deck2[c(13, 26, 39, 52), ]
+deck2[c(13, 26, 39, 52), 3]
+deck2[c(13, 26, 39, 52), 3] <- c(14,14,14,14)
+deck2
+#doing the same thing
+deck2[c(13, 26, 39, 52), 3] <- 14
+deck2$value[c(13, 26, 39, 52)] <- 14
+deck2[c(13, 26, 39, 52), ]$value <- 14
+deck2[c(13, 26, 39, 52), "value"] <- 14
+
+sample(10, 3)
+
+#shuffling the deck
+deck3 <- deck[sample(52), ]
+
+deck3
+
+deck3$face  == "ace"
+deck3[deck3$face == "ace", ]
+deck3[deck3$face == "ace", 3] <- 14
+deck3[deck3$face == "ace", ]
+
+#some simple examples with booleans
+1>2
+2>1
+1 > c(0,1,2)
+c(1,2) > c(0,1,2)  
+c(1,2,3) == c(3,2,1)
+#are these the same?
+all(c(1,2,3) == c(3,2,1))
+
+1 %in% c(3,4,5)
+
+c(1,2) %in% c(3,4,5) # no recycling!
+
+c(1:4) %in% c(3:4)
+
+deck4 <- deck[sample(52), ]
+deck4
+
+deck4[deck4$suit == "hearts", 3] <- 1
+deck4
+deck4[deck4$suit != "hearts", 3] <- 0
+deck4
+
+#Another way to do it
+hearts <- deck4$suit == "hearts"
+not_hearts <- deck4$suit != "hearts"
+deck4[hearts, 3] <- 1
+deck4[!hearts, 3] <- 0
+
+deck4$value <- 0
+deck4[hearts, 3] <- 1
+
+#Next thing
+
+hearts <- deck4$suit == "hearts"
+
+hearts
+
+deck4$value <- as.numeric(hearts)
+
+queens <- deck4$face == "queen"
+spades <- deck4$suit == "spades"
+deck4[queens & spades, 3] <- 13
+deck4[queens & spades, ]
+
+#NAs are contigious
+1 + NA
+NA == 1 
+c(NA, 1:50)
+mean(c(NA, 1:50))
+
+mean(c(NA, 1:50), na.rm = TRUE)
+
+x <- c(NA, 1:50)
+
+is.na(x)
+
+x[!is.na(x)]
+
+x <- c(NA, 1:50, 1/0)
+x
+is.finite(x)
+
+deck
+#function that takes deck as input and takes another input as 
+#number of cards (4) called deal
+
+deal <- function(deck, n =5){
+  n.deck <- nrow(deck)
+  shuffled_deck <- deck[sample(n.deck), ]
+  hand <- head(shuffled_deck, n)
+  rest <- tail(shuffled_deck, n.deck-n)
+  return(list(hand = hand, rest = rest))
+}
+
+deck
+current.deck <- deck
+
+temp <- deal(current.deck)
+hand1 <- temp$hand
+current.deck <- temp$rest
+
+temp <- deal(current.deck)
+hand2 <- temp$hand
+current.deck <- temp$rest
+
+temp <- deal(current.deck)
+hand3 <- temp$hand
+current.deck <- temp$rest
+
+temp <- deal(current.deck)
+hand4 <- temp$hand
+current.deck <- temp$rest
+
+hand1
+hand2
+hand3
+hand4
+
+#DepMap/Skyros Intro
+install.packages('devtools')
+library(devtools)
+devtools::install_github("https://github.com/broadinstitute/taigr", force=T)
+dir.create(path.expand("~/.taiga"))
+write("1012a156-dd30-4f34-85ae-a76187bf2aec", file=path.expand("~/.taiga/token"))
+
+options(taigaclient.path=path.expand("/opt/miniconda3/envs/taigapy/bin/taigaclient"))
+
+taigr::load.from.taiga("taigr-data-40f2.7/tiny_matrix")
+
+#Conditionals-----
+
+num <- -2
+
+absolute_value <- function(num) {
+  if(num <0){
+    num <- num * -1
+  }
+  num
+}
+
+absolute_value(4)
+absolute_value(-4)
+
+absolute_value <- function(num) {
+  if(num <0){
+    print("Input is negative, don't worry I will fix it.")
+    num <- num * -1
+  }
+  num
+}
+
+absolute_value(-4)
+
+#Quick quiz
+x <-1
+if(3 == 3){
+  x <-2
+}
+x
+
+x <- 1
+if(TRUE){
+  x <- 2
+}
+x
+
+#If else statement where input gets changed once
+x <- 1
+if(x ==1){
+  x <- 2
+  if(x == 1){
+    x <- 3
+  }
+}
+x
+
+#If else statement where input gets changed twice
+x <- 1
+if(x ==1){
+  x <- 2
+  if(x == 2){
+    x <- 3
+  }
+}
+x
+
+a <- 3.14
+dec <- a - trunc(a)
+dec
+
+if(dec >= 0.5){
+  a <- trunc(a) + 1 
+} else {
+  a <-  trunc(a)
+}
+
+a <- 5
+b <- 5
+
+if(a>b){
+  print("A wins!")
+}else if(a < b){
+  print("B wins!")
+}else{
+  print("Tie.")
+}
+
+#Write a function that takes one integer as input and
+#prints "Fizz" if it is a multiple of 3, prints "Buzz" if it is 
+#a multiple of 5, and "FizzBuzz" if it is a multiple of 15
+#If the input is none of those, print the input itself
+
+# Remainder
+47 %% 3
+
+#Integer divsions
+47 %/% 3
+
+n <- 67
+div3 <- n %% 3
+div5 <- n %% 5
+div15 <- n %% 15
+
+FizzBizz <- function(n){
+  if (div15 == 0){
+  print("FizzBuzz")
+}else if(div5 == 0){
+  print("Fizz")
+}else if(div3 == 0){
+  print("Buzz")
+}else{
+  print(num)
+}
+}
+
+FizzBizz()
+
+#Sometimes it is easier to use look-up table:
+
+print_die <- function(x){
+  if(x == 1){
+    print("One")
+  }else if(x == 2){
+  }...
+  else{
+    print("Input is not between 1 and 6")
+  }
+}
+
+
+x <- 4
+
+print_die <- function(x){
+  die = c("one", "two", "three", "four", "five", "six")
+  if (x %in% 1:6){
+    print("Input is between 1 and 6")
+  }else{
+    print("Input is not between 1 and 6")
+  }
+}
+
+print_die(2*x)
+
+
+
