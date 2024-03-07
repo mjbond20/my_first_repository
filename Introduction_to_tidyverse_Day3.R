@@ -587,8 +587,7 @@ ggplot(aes(x = displ, y = hwy)) +
     dplyr::filter(cyl %in% c(4,6),
                   drv %in% c("4", "f"))
   
-  mpg_tiny
-  
+
   #geom_sina gives you points if there is a reasonable amount
   
 #ggbeeswarm ----
@@ -596,4 +595,311 @@ ggplot(aes(x = displ, y = hwy)) +
 ggplot(mpg, aes(class, hwy,
                 color = drv)) +
   geom_quasirandom()
+  
+library(ggridges)
+  mpg_tiny %>%
+    ggplot() +
+    geom_density_ridges()
+  
+  mpg %>%
+  ggplot()
+  
+  
+  #Bar graph, count is not part of the dataset
+  #it is calcualted by r
+  mpg %>%
+    ggplot() +
+    geom_bar(aes(x = class))
+  
+  #this is identical
+  
+  mpg %>%
+    ggplot() +
+    geom_bar(aes(x = class, y = after_stat(count)))
+  
+  
+  #stat object
+  ?stat
+  
+  mpg %>%
+    ggplot() +
+    geom_bar(aes(x = class, y=after_stat(prop)))
+  
+  mpg %>%
+    ggplot() +
+    geom_bar(aes(x = class, y=after_stat(prop), group = 1))
+  
+  mpg %>%
+    dplyr::count(class) %>%
+    ggplot() +
+    geom_bar(aes(x = class, y = n), stat = "identity")
+  
+  #Stat summary to change what is plotted, in this case median
+  mpg %>%
+    ggplot() +
+    stat_summary(aes(x = class, y = hwy),
+                 fun = median,
+                 fun.min = min, fun.max = max)
+
+#This is saying to put class on x
+   mpg %>%
+    ggplot() +
+    geom_bar(aes(x = class, fill = drv, 
+                 y = after_stat(prop), 
+                 group = drv))  
+
+#Position argument ----
+
+#stack
+diamonds %>%
+     ggplot() +
+     geom_bar(aes(x = cut, fill = clarity))
+
+#dodger
+   diamonds %>%
+     ggplot() +
+     geom_bar(aes(x = cut, fill = clarity),
+              position = "dodge")
+   
+#fill - proportions
+   diamonds %>%
+     ggplot() +
+     geom_bar(aes(x = cut, fill = clarity),
+              position = "fill")
+   
+#identity - things are on top of each other
+   diamonds %>%
+     ggplot() +
+     geom_bar(aes(x = cut, fill = clarity),
+              position = "identity", 
+              alpha = 0.5)
+   
+   diamonds %>%
+     ggplot() +
+     geom_bar(aes(x = cut, color = clarity),
+              position = "identity", 
+              alpha = 0)
+   
+  #Histogram still need ggplot ----
+   diamonds %>%
+     ggplot() +
+     geom_histogram(aes(x = carat))
+   
+   diamonds %>%
+     ggplot() +
+     geom_histogram(aes(x = carat, fill = cut))
+   
+   #Need smaller bins, default is 30
+   diamonds %>%
+     ggplot() +
+     geom_histogram(aes(x = carat, fill = cut), 
+                    binwidth = 5,
+                    position = "dodge")
+   
+   diamonds %>%
+     ggplot() +
+     geom_histogram(aes(x = carat, fill = cut), 
+                    position = "fill")
+   
+
+   mpg %>%
+     ggplot() +
+     geom_point(aes(x = displ, y = hwy), 
+                position = "jitter")
+   
+   mpg %>%
+     ggplot() +
+     geom_boxplot(aes(x = class, y = hwy))
+   
+#this is what happens when you have x be an integer
+#but we want it to be a character so we can tell it
+   mpg %>%
+     ggplot () +
+     geom_boxplot(aes(x = cyl, y = hwy))
+   
+#interpreting it as a character
+   mpg %>%
+     ggplot () +
+     geom_boxplot(aes(x = as.character(cyl), y = hwy))
+   
+#Most common
+   mpg %>%
+     ggplot () +
+     geom_boxplot(aes(x = as.factor(cyl), y = hwy))
+   
+#fct_infreq
+?fct_infreq
+reorder()
+
+mpg %>%
+  ggplot() +
+  geom_boxplot(aes(x = trans, y = displ))
+
+#reorder ----
+mpg %>%
+  ggplot() +
+  geom_boxplot(aes(x = reorder(trans, displ, median),
+                   y = displ))
+
+#play with boxplot ----
+mpg %>%
+  ggplot () +
+  geom_boxplot(aes(x = as.factor(cyl), y = hwy))
+
+mpg %>%
+  ggplot () +
+  geom_boxplot(aes(x = as.factor(cyl), y = hwy, fill = drv))
+
+mpg %>%
+  ggplot () +
+  geom_boxplot(aes(x = trans, y = hwy, fill = drv))
+
+mpg %>%
+  ggplot() +
+  geom_boxplot(aes(x = as.factor(cyl), 
+                   y = hwy,
+                   color = class)) +
+  labs(x = "cyl")
+
+mpg %>%
+  ggplot() +
+  geom_boxplot(aes(x = as.factor(cyl), 
+                   y = hwy,
+                   color = class),
+               position = "identity") +
+  labs(x = "cyl")
+
+mpg %>%
+  ggplot(aes(x = class, y = hwy)) +
+  geom_boxplot()
+
+mpg %>%
+  ggplot(aes(x = class, y = hwy)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 75, 
+                                  vjust = 1,
+                                  hjust = 1))
+mpg %>%
+  ggplot(aes(x = class, y = hwy)) +
+  geom_boxplot() +
+  coord_flip()
+
+mpg %>%
+  ggplot(aes(x = reorder(class, hwy), y = hwy)) +
+  geom_boxplot() +
+  coord_flip()
+
+bar <- ggplot(diamonds) +
+  geom_bar(aes(x = cut, fill = cut),
+           show.legend = FALSE, width = 1)
+
+bar <- ggplot(diamonds) +
+  geom_bar(aes(x = cut, fill = cut),
+           show.legend = FALSE, width = 1) +
+  theme(aspect.ratio = 1)
+
+#Same thing as above, but showing how you can change labels
+bar <- ggplot(diamonds) +
+  geom_bar(aes(x = cut, fill = cut),
+           show.legend = FALSE, width = 1) +
+  theme(aspect.ratio = 1) +
+  labs(x = NULL, y = NULL)
+
+#coord_flip, coord_polar, coord_trans, coord_cartesian, coord_fixed ----
+
+bar <- ggplot(diamonds) +
+  geom_bar(aes(x = cut, fill = cut),
+           show.legend = FALSE, width = 1) +
+  theme(aspect.ratio = 1) +
+  labs(x = NULL, y = NULL) +
+  coord_flip()
+
+bar + coord_flip()
+
+bar <- ggplot(diamonds) +
+  geom_bar(aes(x = cut, fill = cut),
+           show.legend = FALSE, width = 1) +
+  theme(aspect.ratio = 1) +
+  labs(x = NULL, y = NULL) +
+  coord_polar()
+
+bar + coord_polar()
+
+bar2 <- bar + coord_flip()
+
+bar3 <- bar + coord_polar()
+
+p1 <- cowplot::plot_grid(bar, bar2, ncol = 1)
+p1
+
+cowplot::plot_grid(p1, bar3, nrow = 1)
+
+mpg %>%
+    ggplot() +
+  geom_point(aes(x = displ, y =hwy)) +
+  coord_trans(x = "log", y = "sqrt")
+
+mpg %>%
+  ggplot() +
+  geom_point(aes(x = cty, y =hwy)) +
+  coord_cartesian()
+
+mpg %>%
+  ggplot() +
+  geom_point(aes(x = cty, y =hwy)) +
+  coord_cartesian(xlim = c(0, NA),
+                  ylim = c(0, NA))
+
+mpg %>%
+  ggplot() +
+  geom_point(aes(x = cty, y =hwy)) +
+  coord_cartesian(xlim = c(0, 50),
+                  ylim = c(0, 50))
+
+mpg %>%
+  ggplot(aes(x = cty, y = hwy)) +
+  geom_point() +
+  geom_smooth() +
+  coord_cartesian(xlim = c(10,20), ylim = c(10,30))
+
+mpg %>%
+  ggplot(aes(x = cty, y = hwy)) +
+  geom_point() +
+  geom_smooth() +
+  coord_cartesian(xlim = c(10,20), ylim = c(10,35))
+
+mpg %>%
+  ggplot(aes(x = cty, y = hwy)) +
+  geom_point() +
+  geom_smooth() +
+  geom_abline() +
+  coord_cartesian(xlim = c(10,20), ylim = c(10,35))
+
+mpg %>%
+  ggplot(aes(x = cty, y = hwy)) +
+  geom_point() +
+  geom_smooth() +
+  geom_abline() +
+  geom_abline(slope = 2, intercept = 1) +
+  coord_cartesian(xlim = c(10,20), ylim = c(10,35))
+
+#distinguish the two lines
+mpg %>%
+  ggplot(aes(x = cty, y = hwy)) +
+  geom_point() +
+  geom_smooth() +
+  geom_abline() +
+  geom_abline(slope = 2, intercept = 1, lty = 2) +
+  coord_cartesian(xlim = c(10,20), ylim = c(10,35))
+
+#Adding vertical and horizantel lines
+mpg %>%
+  ggplot(aes(x = cty, y = hwy)) +
+  geom_point() +
+  geom_smooth() +
+  geom_abline() +
+  geom_vline(aes(xintercept = 15)) +
+  geom_hline(aes(yintercept = 20)) +
+  geom_abline(slope = 2, intercept = 1, lty = 2) +
+  coord_cartesian(xlim = c(10,20), ylim = c(10,35))
   
