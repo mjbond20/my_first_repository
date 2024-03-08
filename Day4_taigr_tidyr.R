@@ -14,6 +14,7 @@ options(taigaclient.path=path.expand("/opt/miniconda3/envs/taigapy/bin/taigaclie
 taigr::load.from.taiga("taigr-data-40f2.7/tiny_matrix")
 
 library(nycflights13)
+library(stocks)
 
 #Data Transformations----
 #Filtering rows
@@ -530,13 +531,194 @@ table5
 table5 %>%
   tidyr::unite(year, century, year, sep = "")
 
-#Missing values
-
-
 #We will learn this tomorrow morning, but we reproduced table1
 #This joins two tables using their common variables
 dplyr::left_join(tidy4a, tidy4b)
 table1
+
+#Missing values
+stocks <- tibble(
+  year = c(2015, 2015, 2015,2015, 2016, 2016, 2016),
+  qtr = c(1,2,3,4,2,3,4),
+  return = c(1.88, 0.56, 0.35, NA, 0.9, 0.16, 2.5)
+)
+
+stocks
+
+stocks %>%
+  tidyr::pivot_wider(names_from = year, values_from = return)
+
+stocks %>%
+  tidyr::pivot_wider(names_from = year, values_from = return) %>%
+  tidyr::pivot_longer(cols = 2:3,
+                      names_to = "year",
+                      values_to = "return",
+                      values_drop_na = TRUE)
+stocks %>%
+  tidyr::complete(year, qtr)
+
+#Relational Data ----
+
+# primary key uniquely identifies an observation in its own table
+#foreign key uniquely identifies an observation in another table
+#some datasets don't have primary keys, if so should make one
+
+#checking if keys actually identifies each observation
+planes %>%
+  head
+
+planes %>%
+  dplyr::distinct(tailnum)
+
+#check for duplicate rows
+planes %>%
+  dplyr::count(tailnum) %>%
+  dplyr::filter(n > 1)
+
+weather %>%
+  dplyr::count(origin, year, month, day, hour) %>%
+  dplyr::filter(n > 1)
+
+#not good because n = 2 for some things
+flights %>%
+  dplyr::count(year, month, day, flight)
+
+#This is good
+flights %>%
+  dplyr::count(flight, time_hour, carrier) %>%
+  dplyr::filter(n > 1)
+
+flights %>%
+  dplyr::mutate(row_index = 1:n(),
+                .before = year)
+#n() is a shorthand for nrow() or n anything
+
+#let's work with a trimmed dataset
+
+flights2 <- flights %>%
+  dplyr::select(year:day, hour, origin, dest, tailnum, carrier)
+
+flights2 %>%
+  dplyr::left_join(airlines)
+
+# carrier is a foreign key, but it is critical to join because it is shared with the airlines table
+
+#mutating joins and filtering joins ----
+
+x <- tibble(key = 1:3,
+            val_x = c("x1", "x2", "x3"))
+
+y <- tibble(key = c(1,2,4),
+            val_y = c("y1", "y2", "y3"))
+
+x
+y
+
+dplyr::left_join(x,y)
+dplyr::right_join(x,y)
+dplyr::full_join(x,y)
+dplyr::inner_join(x,y)
+
+#we can explicitly specify the keys to join
+x %>%
+  dplyr::inner_join(y, join_by("key"))
+
+#how do duplicate keys behave?
+x <- tibble(key = c(1,2,2,1),
+            val_x = c("x1", "x2", "x3", "x4"))
+
+y <- tibble(key = c(1,2),
+            val_y = c("y1", "y2"))
+
+x
+y
+
+x %>%
+  dplyr::left_join(y)
+
+flights2
+weather
+
+flights2 %>%
+  dplyr::left_join(weather, join_by("month", "day"))
+
+# all the common column names
+dplyr::left_join(flights2, weather)
+
+dplyr::left_join(flights2, planes,
+                 by = "tailnum")
+
+#Join columns that have different column names for the same data
+dplyr::left_join(flights2, airports,
+                 by = c("origin" = "faa"))
+
+dplyr::left_join(flights2, airports,
+                 by = c("dest" = "faa"))
+
+#Doesn't work
+dplyr::left_join(flights2, weather,
+                 by = c("month", "day", "origin"))
+
+#Filtering joins ----
+x
+y
+
+dplyr::semi_join(x,y)
+dplyr::anti_join(x,y)
+
+x <- tibble(key = 1:3,
+            val_x = c("x1", "x2", "x3"))
+
+y <- tibble(key = c(1,2,4),
+            val_y = c("y1", "y2", "y3"))
+
+x
+y
+
+dplyr::semi_join(x,y)
+dplyr::anti_join(x,y)
+
+(top_dest <- flights %>%
+  dplyr::count(dest, sort = TRUE) %>%
+  head(10))
+
+#these are equivalent below
+flights2 %>%
+    dplyr::filter(dest %in% top_dest$dest)
+
+flights2 %>%
+  dplyr::semi_join(top_dest)
+
+#all the tail numbers listed in flights 2 exist in planes
+#have to join by some defining characteristic - in this case tailnum
+flights2 %>%
+  dplyr::anti_join(planes, by = "tailnum")
+
+flights2 %>%
+  dplyr::anti_join(planes, by = "tailnum") %>%
+  dplyr::count(tailnum, sort = TRUE)
+
+
+flights2 %>%
+  dplyr::anti_join(planes, by = "tailnum") %>%
+  dplyr::count(tailnum, sort = TRUE) %>%
+  drop_na() %>%
+  ggplot() +
+  geom_histogram(aes(x = n), binwidth = 1,) +
+  coord_fixed(10)
+
+# Set operations ----
+
+x <- 1:10
+y <- rep(5:15, each = 2)
+
+intersect(x,y)
+
+union(x,y)
+
+setdiff(x,y)
+setdiff(y,x)
+unique(y)
 
 #Use w/ caution
 colnmaes(CRISPRGeneDependency) <- colnames(CRISPRGeneDependency) %>% word()
